@@ -12,6 +12,8 @@ all_combos <- read_csv("data-processed/all_combos_allopatry.csv") %>%
 	split (.$combination)
 
 ### set up Tilman to Chesson conversion, including mapping from supply point to zones for alpha conversion
+
+
 ## first set up some supply points
 ns <- c(seq(1*(min(all_rstars$n_star) - 0.01), 1*(max(all_rstars$n_star) + 0.01), length.out = 4), 
 		seq(2*(min(all_rstars$n_star) - 0.01), 2*(max(all_rstars$n_star) + 0.01), length.out = 4),
