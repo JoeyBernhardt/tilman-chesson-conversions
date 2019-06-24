@@ -3,7 +3,11 @@ library(tidyverse)
 library(cowplot)
 
 ## get data
+
+### this file has the R*s and the consumption vectors
 all_rstars <- read_csv("data-processed/all-rstars.csv")
+
+## this file has the combinations of popualtions we want to compete against one another
 all_combos <- read_csv("data-processed/all_combos_allopatry.csv") %>% 
 	split (.$combination)
 
@@ -26,17 +30,20 @@ find_alphas_combos <- function(combos, SN1, SP1){
 	pop1 <- snippet$population[[1]]
 	pop2 <- snippet$population[[2]]
 	
+	## consumption vectors
 	c1P <- snippet$pc[snippet$population == pop1]
 	c2P <- snippet$pc[snippet$population == pop2]
 	c1N <- snippet$nc[snippet$population == pop1]
 	c2N <- snippet$nc[snippet$population == pop2]
+	
+	## R*s
 	R1P <- snippet$p_star[snippet$population == pop1]
 	R2N <- snippet$n_star[snippet$population == pop2]
 	R2P <- snippet$p_star[snippet$population == pop2]
 	R1N <- snippet$n_star[snippet$population == pop1]
 	D <- 0.5 ## set dilution
 	
-	## define the consumption vector lines
+	## supply points
 	
 	SN <- SN1
 	SP <- SP1
@@ -45,6 +52,7 @@ find_alphas_combos <- function(combos, SN1, SP1){
 	r1 <- max(snippet$p_umax[snippet$population == pop1], snippet$n_umax[snippet$population == pop1])
 	r2 <- max(snippet$p_umax[snippet$population == pop2], snippet$n_umax[snippet$population == pop2])
 	
+	## define the consumption vector lines
 	cons_vec1_intercept <- max(R1P, R2P) -(c1P/c1N)*max(R1N, R2N)
 	cons_vec2_intercept <- max(R1P, R2P) -(c2P/c2N)*max(R1N, R2N)
 	supply_vec <- SP/SN
@@ -63,6 +71,8 @@ find_alphas_combos <- function(combos, SN1, SP1){
 		y <- (SP/SN)*x
 		return(y)
 	}
+	
+	## find out what zone we are in
 	
 	zone_middle <- cons_vec2_fun(SN) <= supply_vec_fun(SN) & supply_vec_fun(SN) <= cons_vec1_fun(SN) | cons_vec1_fun(SN) <= supply_vec_fun(SN) & supply_vec_fun(SN) <= cons_vec2_fun(SN)
 	zone_bottom <- cons_vec2_fun(SN) >= supply_vec_fun(SN) & supply_vec_fun(SN) <= cons_vec1_fun(SN)
@@ -112,6 +122,8 @@ for(i in ns){
 		results <- bind_rows(results, hold)
 	}}
 
+## calculate the niche and fitness differences
+
 results2b <- results %>% 
 	mutate(rho = sqrt((a12*a21)/(a11*a22))) %>% 
 	mutate(fit_ratio = (sqrt((a11*a12)/(a22*a21)) * (r2-D)/(r1-D))) %>% 
@@ -150,7 +162,7 @@ ggsave("figures/population_10_1_combo.png", width = 8, height = 6)
 
 ## this is clearly wrong, zngis aren't crossing, and the consumption vectors don't cross at the right place
 ## because the consumption vectors are written such they cross at the elbows of the crossing zngis
-
+## here we have nested zngis
 
 snip2 <- results2b %>%
 	mutate(combination = paste(pop1, pop2, sep = "_")) %>% 
