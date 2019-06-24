@@ -1,9 +1,6 @@
 
-
-
 library(tidyverse)
 library(cowplot)
-
 
 ## get data
 all_rstars <- read_csv("data-processed/all-rstars.csv")
@@ -11,8 +8,7 @@ all_combos <- read_csv("data-processed/all_combos_allopatry.csv") %>%
 	split (.$combination)
 
 ### set up Tilman to Chesson conversion, including mapping from supply point to zones for alpha conversion
-
-
+## first set up some supply points
 ns <- c(seq(1*(min(all_rstars$n_star) - 0.01), 1*(max(all_rstars$n_star) + 0.01), length.out = 4), 
 		seq(2*(min(all_rstars$n_star) - 0.01), 2*(max(all_rstars$n_star) + 0.01), length.out = 4),
 		seq(3*(min(all_rstars$n_star) - 0.01), 3*(max(all_rstars$n_star) + 0.01), length.out = 4))
@@ -38,9 +34,9 @@ find_alphas_combos <- function(combos, SN1, SP1){
 	R2N <- snippet$n_star[snippet$population == pop2]
 	R2P <- snippet$p_star[snippet$population == pop2]
 	R1N <- snippet$n_star[snippet$population == pop1]
-	D <- 0.5
+	D <- 0.5 ## set dilution
 	
-	## how can we define the consumption vector lines?
+	## define the consumption vector lines
 	
 	SN <- SN1
 	SP <- SP1
